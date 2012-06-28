@@ -3,6 +3,14 @@ Pie = require '../../models/pie'
 routes = (app) ->
   app.namespace '/admin', ->
 
+    # Authentication check
+    app.all '/*', (req, res, next) ->
+      if not (req.session.currentUser)
+        req.flash 'error', 'Please login.'
+        res.redirect '/login'
+        return
+      next()
+
 
     app.namespace '/pies', ->
       
@@ -25,5 +33,19 @@ routes = (app) ->
         pie.save () ->
           req.flash 'info', "Pie '#{pie.name}' was saved."
           res.redirect '/admin/pies'
+      app.put '/:id', (req, res) ->
+        Pie.getById req.params.id, (err, pie) ->
+          if _.include(Pie.states, req.body.state)
+            pie[req.body.state] ->
+              if socketIO = app.settings.socketIO
+                socketIO.sockets.emit "pie:changed", pie
+              # Send plain text reply with default success statusCode of 200.
+              res.send "/admin/pies/#{req.params.id}"
+          else
+            res.render 'error',
+              status: 403,
+              message: "Incorrect Pie state: #{req.body.state} is not a recognized state."
+              title: "Incorrect Pie state"
+              stylesheet: 'admin'
 
 module.exports = routes
