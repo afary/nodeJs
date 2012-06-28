@@ -6,7 +6,8 @@ require('coffee-script');
 
 var express = require('express'),
     RedisStore = require('connect-redis')(express);
-  
+
+require('express-namespace');  
 
 var app = module.exports = express.createServer();
 
@@ -45,6 +46,8 @@ require('./apps/helpers')(app);
 // Routes
 
 require('./apps/authentication/routes')(app)
+require('./apps/admin/routes')(app)
+
 app.listen(app.settings.port);
 
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
