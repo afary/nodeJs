@@ -14,7 +14,25 @@ helpers = (app) ->
         [expected, 'on']
       else
         expected
-
+    
+    cssClassForPieAge: (pie) ->
+      pieAge = (new Date).getTime() - pie.stateUpdatedAt
+      minutes = (num) -> 1000 * 60 * num
+      switch pie.state
+        when 'making'
+          if pieAge > minutes(1)
+            'almost-ready'
+          else
+            'not-ready'
+        when 'ready'
+          if pieAge < minutes(1)
+            'pipin-hot'
+          else if pieAge < minutes(2)
+            'hot'
+          else
+            'warm'
+        else
+          null
 
 
 

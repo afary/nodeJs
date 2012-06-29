@@ -9,7 +9,9 @@
     "redis": "~0.7.2",
     "connect-redis": "~1.4.0",
     "hiredis": "~0.1.14",
-    "express-namespace": "~0.1.1"
+    "express-namespace": "~0.1.1",
+    "connect-assets": "~2.2.1",
+    "socket.io": "~0.9.6"
   },
   "devDependencies": {
     "node-dev": "~0.2.3",
@@ -18,6 +20,7 @@
     "libxmljs": "~0.5.4"
   },
   "scripts": {
-    "test": "./bin/test"
+    "test": "./bin/test",
+    "devserver": "./node_modules/node-dev/node-dev server.js"
   }
 }

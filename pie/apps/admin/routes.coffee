@@ -11,6 +11,8 @@ routes = (app) ->
         return
       next()
 
+    app.get '/', (req, res) ->
+      res.redirect '/admin/menu/stage'
 
     app.namespace '/pies', ->
       
@@ -30,22 +32,24 @@ routes = (app) ->
           name: req.body.name
           type: req.body.type
         pie = new Pie attributes
-        pie.save () ->
+        pie.save (err, pie) ->
           req.flash 'info', "Pie '#{pie.name}' was saved."
           res.redirect '/admin/pies'
+      
       app.put '/:id', (req, res) ->
         Pie.getById req.params.id, (err, pie) ->
-          if _.include(Pie.states, req.body.state)
+          if req.body.state in Pie.states
             pie[req.body.state] ->
               if socketIO = app.settings.socketIO
                 socketIO.sockets.emit "pie:changed", pie
-              # Send plain text reply with default success statusCode of 200.
-              res.send "/admin/pies/#{req.params.id}"
-          else
-            res.render 'error',
-              status: 403,
-              message: "Incorrect Pie state: #{req.body.state} is not a recognized state."
-              title: "Incorrect Pie state"
-              stylesheet: 'admin'
+               res.send "OK"
+    app.namespace '/menu', ->
+
+      app.get '/stage', (req, res) ->
+        Pie.all (err, pies) ->
+          res.render "#{__dirname}/views/menu/stage",
+            title: 'Pie Status'
+            stylesheet: 'admin'
+            pies: pies      
 
 module.exports = routes
